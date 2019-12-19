@@ -7,14 +7,14 @@ from regression.kernel_regression.models.gaussian_kernel import predict
 
 np.random.seed(101)
 
-# Settings
+# Settings - You can adjust these to look at different data sets, qois, input params, etc.
 path = '../data/'
-images_path = '../../../figures/'
+images_path = '../figures/'
 input_filename = 'CantileverBeam_design_parameters.csv'
 qoi_filename = 'CantileverBeam_QoIs.csv'
 crystal_filename = 'crystalpartitions_truss_maxStress_server_12_18_2019_sigma15_persistence99.csv'
 qoi_name = 'Max Stress'
-input_name = 'Angle'
+input_name = 'Filter Size'
 persistence_level = 17
 crystal_id = 2
 number_of_steps = 50
@@ -61,7 +61,7 @@ ax.set_ylabel(input_name)
 ax.set_title('Ground Truth vs Predicted for Persistence Level '
              + str(persistence_level) + ' and Crystal ' + str(crystal_id) + '\nMSE ={0:.2f}'.format(mse))
 ax.legend()
-fig.savefig()
+fig.savefig(images_path + 'GroundTruth_Prediction_PL'+str(persistence_level)+'_CID'+str(crystal_id)+'.png')
 plt.show()
 
 # Now generate 50 samples between qoi min and max
@@ -81,6 +81,7 @@ ax.set_xlabel(qoi_name)
 ax.set_ylabel(input_name)
 ax.set_title('Training Data vs Prediction for 50 Equidistant Samples')
 ax.legend()
+fig.savefig(images_path + 'Training_Data_Prediction_PL'+str(persistence_level)+'_CID'+str(crystal_id)+'.png')
 plt.show()
 
 # Plot Prediction Only
@@ -89,4 +90,5 @@ ax.plot(new_samples, new_predicted)
 ax.set_xlabel(qoi_name)
 ax.set_ylabel(input_name)
 ax.set_title('Predicted Value for 50 Equidistant Samples')
+fig.savefig(images_path + 'Prediction_Only_PL'+str(persistence_level)+'_CID'+str(crystal_id)+'.png')
 plt.show()
