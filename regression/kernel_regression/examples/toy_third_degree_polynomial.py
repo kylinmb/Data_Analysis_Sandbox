@@ -1,3 +1,7 @@
+"""
+This example uses the kernel regression model to approximate
+the third degree polynomial in toy_data.py
+"""
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import mean_squared_error

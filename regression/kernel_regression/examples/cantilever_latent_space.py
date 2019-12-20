@@ -1,3 +1,7 @@
+"""
+This example uses the kernel regression model to generate new
+latent space values from QoIs
+"""
 import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_squared_error

@@ -1,3 +1,7 @@
+"""
+This example uses the kernel regression model to generate new
+input parameters from QoIs
+"""
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -8,7 +12,7 @@ from regression.kernel_regression.models.gaussian_kernel import predict
 # So results are reproducible
 np.random.seed(101)
 
-# Settings - You can adjust these to look at different data sets, qois, input params, etc.
+# Settings - You can adjust these to look at different data sets, QoIs, input params, etc.
 persistence_level = 17
 crystal_id = 2
 number_of_steps = 50
