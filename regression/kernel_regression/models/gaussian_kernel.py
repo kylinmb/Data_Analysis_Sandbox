@@ -4,8 +4,9 @@ from scipy.stats import norm
 
 # This function uses the Nadaraya-Watson method to perform
 # kernel regression using a gaussian kernel
+# this method expects ndarray with two dimensions
 def predict(x_new, x_train, y_train, sigma):
-    y_predicted = np.zeros(x_new.shape[0])
+    y_predicted = np.zeros((x_new.shape[0], y_train.shape[1]))
     for x_n_index, x_n in enumerate(x_new):
         numerator = 0
         denominator = 0

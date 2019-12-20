@@ -5,20 +5,22 @@ from sklearn.metrics import mean_squared_error
 
 from regression.kernel_regression.models.gaussian_kernel import predict
 
+# So results are reproducible
 np.random.seed(101)
 
 # Settings - You can adjust these to look at different data sets, qois, input params, etc.
+persistence_level = 17
+crystal_id = 2
+number_of_steps = 50
+sigma = 0.25
+qoi_name = 'Max Stress'
+input_name = 'Angle'
+# Path settings
 path = '/usr/sci/projects/dSpaceX/DATA/CantileverBeam_wclust_wraw/'
-images_path = '../figures/'
+images_path = '../generated_figures/'
 input_filename = 'CantileverBeam_design_parameters.csv'
 qoi_filename = 'CantileverBeam_QoIs.csv'
 crystal_filename = 'CantileverBeam_CrystalPartitions_maxStress.csv'
-qoi_name = 'Max Stress'
-input_name = 'Angle'
-persistence_level = 15
-crystal_id = 1
-number_of_steps = 50
-sigma = 0.25
 
 # Get input parameters, QOIS, and crystal partitions from file
 input_df = pd.read_csv(path + input_filename)
@@ -32,7 +34,7 @@ crystal = crystal_df.loc[persistence_level, crystal_df.loc[persistence_level, :]
 qoi_df_crystal = qoi_df.loc[crystal, :]
 param_df_crystal = input_df.loc[crystal, :]
 
-# Create training and test data set for specific qoi and input param of interest
+# Create general training and test data sets
 mask = np.random.rand(len(qoi_df_crystal)) < 0.7
 qoi_train_df = qoi_df_crystal[mask]
 qoi_test_df = qoi_df_crystal[~mask]
@@ -40,13 +42,14 @@ qoi_test_df = qoi_df_crystal[~mask]
 param_train_df = param_df_crystal[mask]
 param_test_df = param_df_crystal[~mask]
 
+# Select single qoi of interest and create numpy arrays
 train_df = pd.concat([qoi_train_df, param_train_df], axis=1).sort_values(by=[qoi_name])
-train_x = train_df.loc[:, qoi_name].to_numpy()
-train_y = train_df.loc[:, input_name].to_numpy()
+train_x = train_df.loc[:, qoi_name].to_numpy().reshape((-1, 1))
+train_y = train_df.loc[:, input_name].to_numpy().reshape((-1, 1))
 
 test_df = pd.concat([qoi_test_df, param_test_df], axis=1).sort_values(by=[qoi_name])
-test_x = test_df.loc[:, qoi_name].to_numpy()
-test_y = test_df.loc[:, input_name].to_numpy()
+test_x = test_df.loc[:, qoi_name].to_numpy().reshape((-1, 1))
+test_y = test_df.loc[:, input_name].to_numpy().reshape((-1, 1))
 
 # Predict value for test data and computes MSE
 test_predicted = predict(test_x, train_x, train_y, sigma)
@@ -69,7 +72,7 @@ plt.show()
 min_qoi = qoi_df_crystal.loc[:, qoi_name].min()
 max_qoi = qoi_df_crystal.loc[:, qoi_name].max()
 step_size = (max_qoi - min_qoi) / number_of_steps
-new_samples = np.arange(min_qoi, max_qoi, step_size)
+new_samples = np.arange(min_qoi, max_qoi, step_size).reshape((-1, 1))
 
 # predict input param for new samples
 new_predicted = predict(new_samples, train_x, train_y, sigma)

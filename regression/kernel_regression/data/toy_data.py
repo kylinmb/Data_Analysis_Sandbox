@@ -8,4 +8,6 @@ def third_degree_poly(x):
 
 
 def third_degree_poly_with_noise(x, noise_scale):
-    return x ** 3 - 4 * x ** 2 + 2 * x - 5 + np.random.rand(x.shape[0]) * noise_scale
+    poly = third_degree_poly(x)
+    noise = np.random.rand(x.shape[0], x.shape[1]) * noise_scale
+    return poly + noise
