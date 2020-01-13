@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_squared_error
 
-from regression.kernel_regression.models.gaussian_kernel import predict
+from regression.kernel_regression.models.gaussian_kernel import predict, predict_matrix
 
 # So results are reproducible
 np.random.seed(101)
@@ -56,8 +56,11 @@ test_y = latent_test_df.to_numpy()
 
 # Predict value for test data and compute MSE
 test_predicted = predict(test_x, train_x, train_y, sigma)
-mse = mean_squared_error(test_y, test_predicted)
-print('The MSE is: ' + str(mse))
+matrix_prediction = predict_matrix(test_x, train_x, train_y, sigma)
+mse_for = mean_squared_error(test_y, test_predicted)
+mse_matrix = mean_squared_error(test_y, matrix_prediction)
+print('The MSE using the for loop is: ' + str(mse_for))
+print('The MSE using the for loop is: ' + str(mse_matrix))
 
 # Generate 50 samples between qoi min and max
 min_qoi = qoi_df_crystal.loc[:, qoi_name].min()

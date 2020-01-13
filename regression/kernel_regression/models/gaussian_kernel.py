@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.stats import norm
+from scipy.spatial.distance import pdist
 
 
 def predict(x_new, x_train, y_train, sigma):
@@ -26,3 +27,51 @@ def predict(x_new, x_train, y_train, sigma):
             denominator += norm.pdf(x_n, x_t, sigma)
         y_predicted[x_n_index] = numerator / denominator
     return y_predicted
+
+
+def predict_matrix(x_new, x_train, y_train, sigma):
+    """
+    Uses the predict_matrix_helper function to perform Nadaraya-Watson Regression,
+    a Gaussian PDF, and matrix algebra
+    :param x_new: Input values you would like to make an output prediction for
+    :param x_train: Known input values; used for training and prediction
+    :param y_train: Known output values; used for training and prediction
+    :param sigma: standard deviation for Gaussian PDF
+    :return:
+    """
+    y_predicted = []
+    for x in x_new:
+        pred = predict_matrix_helper(x, x_train, y_train, sigma)
+        y_predicted.append(pred)
+    return np.asarray(y_predicted)
+
+
+def predict_matrix_helper(x_new, x_train, y_train, sigma):
+    """
+    Predict y value for a single input using the Nadaraya-Watson Regression,
+    a Gaussian PDF, and matrix algebra
+    :param x_new: Input values you would like to make an output prediction for
+    :param x_train: Known input values; used for training and prediction
+    :param y_train: Known output values; used for training and prediction
+    :param sigma: standard deviation for Gaussian PDF
+    :return:
+    """
+    # calculate difference
+    difference = x_new - np.transpose(x_train)
+    difference_squared = np.square(difference)
+
+    # Apply gaussian to difference
+    exponent = np.divide(difference_squared, -2*sigma**2)
+    exponent = np.exp(exponent)
+    denominator = np.sqrt(2*np.pi*sigma)
+    gaussian_matrix = exponent / denominator
+
+    # calculate weight and normalization for regression
+    summation = np.sum(gaussian_matrix)
+    gaussian_matrix = gaussian_matrix.transpose()
+    gaussian_matrix = np.repeat(gaussian_matrix, y_train.shape[1], axis=1)
+    output = np.multiply(gaussian_matrix, y_train)
+    output = output.sum(axis=0)
+    return output / summation
+
+

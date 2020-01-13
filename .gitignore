@@ -1,2 +1,3 @@
 .idea/
-./regression/kernel_regression/figures/
+./regression/kernel_regression/generated_data/
+./regression/kernel_regression/generated_figures/
