@@ -7,9 +7,9 @@ def predict(x_new, x_train, y_train, sigma):
     """
     Nadaraya-Watson Regression using Gaussian PDF for kernel
     Complete explanation can be found in: https://www.microsoft.com/en-us/research/uploads/prod/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf
-    :param x_new: Input values you would like to make an output prediction for
-    :param x_train: Known input values; used for training and prediction
-    :param y_train: Known output values; used for training and prediction
+    :param x_new: Input values you would like to make an output prediction for      // desired qois to create new z_coords 
+    :param x_train: Known input values; used for training and prediction            // qoi
+    :param y_train: Known output values; used for training and prediction           // z_coords for each sample's qoi
     :param sigma: standard deviation for Gaussian PDF
     :return: output prediction for x_new
     """
@@ -29,6 +29,7 @@ def predict(x_new, x_train, y_train, sigma):
     return y_predicted
 
 
+# matrix version of predict function above
 def predict_matrix(x_new, x_train, y_train, sigma):
     """
     Uses the predict_matrix_helper function to perform Nadaraya-Watson Regression,
@@ -46,6 +47,7 @@ def predict_matrix(x_new, x_train, y_train, sigma):
     return np.asarray(y_predicted)
 
 
+# takes a single new point (ex: QoI) and calculates its new z_coord
 def predict_matrix_helper(x_new, x_train, y_train, sigma):
     """
     Predict y value for a single input using the Nadaraya-Watson Regression,
@@ -56,22 +58,40 @@ def predict_matrix_helper(x_new, x_train, y_train, sigma):
     :param sigma: standard deviation for Gaussian PDF
     :return:
     """
+
+    print("x_new:")
+    print(x_new)
+    print("x_train shape:")
+    print(x_train.shape)
+    print("y_train shape:")
+    print(y_train.shape)
+    
     # calculate difference
     difference = x_new - np.transpose(x_train)
-    difference_squared = np.square(difference)
+    print("difference: ")
+    print(difference)
 
-    # Apply gaussian to difference
+    # Apply gaussian elementwise to difference:
+    # G = [1 / sqrt(2*pi*sigma)] * e^(-1/2*sigma^2 * dist^2)
+    difference_squared = np.square(difference)
     exponent = np.divide(difference_squared, -2*sigma**2)
     exponent = np.exp(exponent)
     denominator = np.sqrt(2*np.pi*sigma)
-    gaussian_matrix = exponent / denominator
+    gaussian_vector = exponent / denominator
+    print("gaussian_vector:")
+    print(gaussian_vector)
 
     # calculate weight and normalization for regression
-    summation = np.sum(gaussian_matrix)
-    gaussian_matrix = gaussian_matrix.transpose()
-    gaussian_matrix = np.repeat(gaussian_matrix, y_train.shape[1], axis=1)
-    output = np.multiply(gaussian_matrix, y_train)
-    output = output.sum(axis=0)
+    summation = np.sum(gaussian_vector)
+#    gaussian_vector = gaussian_vector.transpose()
+#    gaussian_vector = np.repeat(gaussian_vector, y_train.shape[1], axis=1) # in order to scale each element of y_train[i] by its corresponding scalar in gaussian using a vector multiply
+#    output = np.multiply(gaussian_vector, y_train)
+#    output = output.sum(axis=0)
+    output = gaussian_vector.dot(y_train)   # the equivalent of the four preceeding lines (matrix multiplaction then columnwise collapse)
+    print("output before division:")
+    print(output)
+    print("output after division:")
+    print(output / summation)
     return output / summation
 
 
