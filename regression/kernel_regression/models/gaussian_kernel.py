@@ -44,7 +44,9 @@ def predict_matrix(x_new, x_train, y_train, sigma):
     for x in x_new:
         pred = predict_matrix_helper(x, x_train, y_train, sigma)
         y_predicted.append(pred)
-    return np.asarray(y_predicted)
+    y_predicted = np.asarray(y_predicted)
+    y_predicted = y_predicted.reshape(y_predicted.shape[0], y_predicted.shape[2])
+    return y_predicted
 
 
 # takes a single new point (ex: QoI) and calculates its new z_coord
@@ -58,18 +60,8 @@ def predict_matrix_helper(x_new, x_train, y_train, sigma):
     :param sigma: standard deviation for Gaussian PDF
     :return:
     """
-
-    print("x_new:")
-    print(x_new)
-    print("x_train shape:")
-    print(x_train.shape)
-    print("y_train shape:")
-    print(y_train.shape)
-    
     # calculate difference
     difference = x_new - np.transpose(x_train)
-    print("difference: ")
-    print(difference)
 
     # Apply gaussian elementwise to difference:
     # G = [1 / sqrt(2*pi*sigma)] * e^(-1/2*sigma^2 * dist^2)
@@ -78,20 +70,10 @@ def predict_matrix_helper(x_new, x_train, y_train, sigma):
     exponent = np.exp(exponent)
     denominator = np.sqrt(2*np.pi*sigma)
     gaussian_vector = exponent / denominator
-    print("gaussian_vector:")
-    print(gaussian_vector)
 
     # calculate weight and normalization for regression
     summation = np.sum(gaussian_vector)
-#    gaussian_vector = gaussian_vector.transpose()
-#    gaussian_vector = np.repeat(gaussian_vector, y_train.shape[1], axis=1) # in order to scale each element of y_train[i] by its corresponding scalar in gaussian using a vector multiply
-#    output = np.multiply(gaussian_vector, y_train)
-#    output = output.sum(axis=0)
-    output = gaussian_vector.dot(y_train)   # the equivalent of the four preceeding lines (matrix multiplaction then columnwise collapse)
-    print("output before division:")
-    print(output)
-    print("output after division:")
-    print(output / summation)
+    output = gaussian_vector.dot(y_train)
     return output / summation
 
 
