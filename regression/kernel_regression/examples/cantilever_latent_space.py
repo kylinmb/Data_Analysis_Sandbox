@@ -60,7 +60,7 @@ matrix_prediction = predict_matrix(test_x, train_x, train_y, sigma)
 mse_for = mean_squared_error(test_y, test_predicted)
 mse_matrix = mean_squared_error(test_y, matrix_prediction)
 print('The MSE using the for loop is: ' + str(mse_for))
-print('The MSE using the for loop is: ' + str(mse_matrix))
+print('The MSE using the matrix loop is: ' + str(mse_matrix))
 
 # Generate 50 samples between qoi min and max
 min_qoi = qoi_df_crystal.loc[:, qoi_name].min()
