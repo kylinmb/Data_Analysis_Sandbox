@@ -12,11 +12,11 @@ from regression.kernel_regression.models.gaussian_kernel import predict, predict
 np.random.seed(101)
 
 # Settings
-persistence_level = 17
-crystal_id = 2
+persistence_level = 10
+crystal_id = 9
 qoi_name = 'Max Stress'
 sigma = 0.25
-number_of_steps = 50
+number_of_steps = 1  # 50
 
 # Path Settings
 generated_data_path = '../generated_data/'
@@ -38,6 +38,8 @@ crystal = crystal_df.loc[persistence_level, crystal_df.loc[persistence_level, :]
 # Get QoI (x) and Latent Space (y) for persistence level and single crystal
 qoi_df_crystal = qoi_df.loc[crystal, :]
 latent_df_crystal = latent_df.loc[crystal, :]
+all_qoi_data = qoi_df_crystal.loc[:, qoi_name].to_numpy().reshape((-1, 1))
+all_latent_data = latent_df_crystal.to_numpy()
 
 # Create general training and test data sets
 mask = np.random.rand(len(qoi_df_crystal)) < 0.7
@@ -60,15 +62,16 @@ matrix_prediction = predict_matrix(test_x, train_x, train_y, sigma)
 mse_for = mean_squared_error(test_y, test_predicted)
 mse_matrix = mean_squared_error(test_y, matrix_prediction)
 print('The MSE using the for loop is: ' + str(mse_for))
-print('The MSE using the matrix loop is: ' + str(mse_matrix))
+print('The MSE using the matrix is: ' + str(mse_matrix))
 
 # Generate 50 samples between qoi min and max
 min_qoi = qoi_df_crystal.loc[:, qoi_name].min()
 max_qoi = qoi_df_crystal.loc[:, qoi_name].max()
 steps_size = (max_qoi - min_qoi) / number_of_steps
-new_samples = np.arange(min_qoi, max_qoi, steps_size).reshape((-1, 1))
+new_samples = np.arange(min_qoi, max_qoi, steps_size).reshape((-1, 1))  # QoIs, just like to
 
 # predict latent space for new samples
-new_predicted = predict(new_samples, np.concatenate((train_x, test_x)), np.concatenate((train_y, test_y)), sigma)
+new_predicted = predict_matrix(new_samples, all_qoi_data, all_latent_data, sigma)
+
 np.savetxt(generated_data_path + 'new_latent_space_for_PL' + str(persistence_level) + '_CID' + str(crystal_id) + '.csv',
            new_predicted, delimiter=',')
